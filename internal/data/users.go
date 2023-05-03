@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"greenlight.bcc/internal/pointer"
 	"greenlight.bcc/internal/validator"
 )
 
@@ -213,17 +214,78 @@ type MockUserModel struct {
 }
 
 func (m MockUserModel) Insert(user *User) error {
+	switch user.Email {
+	case "test@test.com":
+		return ErrDuplicateEmail
+	}
+
 	return nil
 }
 
 func (m MockUserModel) GetByEmail(email string) (*User, error) {
-	return nil, nil
+	hash1, err := bcrypt.GenerateFromPassword([]byte("1234567a"), 12)
+	if err != nil {
+		return nil, err
+	}
+
+	switch email {
+	case "test@test.com":
+		return &User{
+			Name:     "Ryan Gosling",
+			Email:    "test@test.com",
+			Password: password{plaintext: pointer.ToString("1234567a"), hash: hash1},
+		}, nil
+	case "wads@wasd.com":
+		return &User{
+			Name:     "Ryan Gosling 2",
+			Email:    "wads@wasd.com",
+			Password: password{plaintext: pointer.ToString("1234567a"), hash: hash1},
+		}, nil
+	}
+
+	return nil, ErrRecordNotFound
 }
 
 func (m MockUserModel) Update(user *User) error {
-	return nil
+	switch user.Email {
+	case "test@test.com":
+		return nil
+	}
+	return ErrEditConflict
 }
 
 func (m MockUserModel) GetForToken(tokenScope, tokenPlaintext string) (*User, error) {
-	return nil, nil
+	hash1, err := bcrypt.GenerateFromPassword([]byte("1234567a"), 12)
+	if err != nil {
+		return nil, err
+	}
+
+	switch tokenPlaintext {
+	case "BusinessManBusinessPlan123":
+		return &User{
+			ID:        1,
+			Name:      "Ryan Gosling",
+			Email:     "test@test.com",
+			Password:  password{plaintext: pointer.ToString("1234567a"), hash: hash1},
+			Activated: true,
+		}, nil
+	case "BusinessManBusinessPlanNOO":
+		return &User{
+			ID:        2,
+			Name:      "NOT Ryan Gosling",
+			Email:     "test@test.com",
+			Password:  password{plaintext: pointer.ToString("1234567a"), hash: hash1},
+			Activated: false,
+		}, nil
+	case "BusinessManBusinessPlan000":
+		return &User{
+			ID:        3,
+			Name:      "NOT Ryan Gosling Again",
+			Email:     "test@test.com",
+			Password:  password{plaintext: pointer.ToString("1234567a"), hash: hash1},
+			Activated: true,
+		}, nil
+	}
+
+	return nil, ErrRecordNotFound
 }
