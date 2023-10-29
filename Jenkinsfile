@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'golang, postgres:alpine3.18'
+      image 'golang'
     }
 
   }
