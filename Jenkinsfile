@@ -2,19 +2,15 @@ pipeline {
   agent any
   stages {
     stage('Init') {
-      parallel {
-        stage('Init') {
-          steps {
-            echo 'Initializing...'
-          }
-        }
+      steps {
+        echo 'Initializing...'
+        tool 'Go 1.8'
+      }
+    }
 
-        stage('running') {
-          steps {
-            sh 'go run ./cmd/api'
-          }
-        }
-
+    stage('running') {
+      steps {
+        sh 'go run ./cmd/api'
       }
     }
 
