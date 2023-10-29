@@ -1,13 +1,11 @@
 pipeline {
-  agent none
-  stages {
-    stage('Init') {
-      steps {
-        echo 'Initializing...'
-        tool 'Go 1.8'
-      }
+  agent {
+    docker {
+      image 'golang'
     }
 
+  }
+  stages {
     stage('running') {
       steps {
         sh 'go run ./cmd/api'
