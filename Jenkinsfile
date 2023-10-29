@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'golang, postgres:alpine3.18'
+    }
+
+  }
   stages {
     stage('Init') {
       steps {
